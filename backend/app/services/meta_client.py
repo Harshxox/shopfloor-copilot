@@ -227,6 +227,25 @@ def sam_track(video: Path, phrase: str) -> dict[int, list[dict]]:
     return parse_frames(text)
 
 
+def sam_image(image: Path, phrase: str) -> list[dict]:
+    """SAM 3.1 on one still. Returns [{id, x1, y1, x2, y2, w, h}] for every match."""
+    data = "data:image/jpeg;base64," + base64.b64encode(Path(image).read_bytes()).decode()
+    with _timed(f"sam_image '{phrase}'"):
+        stream = client().responses.create(
+            model=config.SAM_MODEL,
+            input=[{"role": "user", "content": [
+                {"type": "input_text", "text": phrase},
+                {"type": "input_image", "image_url": data},
+            ]}],
+            stream=True,
+        )
+        text = ""
+        for event in stream:
+            if getattr(event, "type", "") == "response.output_text.done":
+                text = event.text
+    return parse_frames(text).get(0, [])
+
+
 # ---------- Muse Voice Transcribe ----------
 
 _SPEAKER_TAG = re.compile(r"<\|[^|]*\|>")

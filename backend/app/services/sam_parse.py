@@ -26,6 +26,8 @@ def text_from_jsonl(path: Path) -> str:
 def parse_frames(text: str) -> dict[int, list[dict]]:
     """Return {frame_index: [{"id", "x1", "y1", "x2", "y2", "w", "h"}, ...]}."""
     frames: dict[int, list[dict]] = {}
+    if not FRAME_RE.search(text):  # a single image has no <Nf> frame markers
+        text = "<0f>" + text
     parts = FRAME_RE.split(text)  # ['', '0', '<frame 0 body>', '1', '<frame 1 body>', ...]
     for i in range(1, len(parts) - 1, 2):
         idx, body = int(parts[i]), parts[i + 1]
