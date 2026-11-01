@@ -1,0 +1,4 @@
+openai>=1.99
+requests>=2.32
+python-dotenv>=1.0
+opencv-python>=4.9
