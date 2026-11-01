@@ -1,24 +1,37 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
+import TeachUpload from '../components/TeachUpload.jsx'
 
-// Phase 2: lists existing SOPs. Phase 4 adds recording/upload and step cards.
+const STATUS_CLASS = { ready: 'good', failed: 'bad' }
+
 export default function Teach() {
+  const nav = useNavigate()
   const [sops, setSops] = useState([])
 
-  useEffect(() => {
-    api('/sops').then(setSops).catch(() => setSops([]))
-  }, [])
+  const load = useCallback(() => api('/sops').then(setSops).catch(() => setSops([])), [])
+  useEffect(() => { load() }, [load])
+
+  const onReady = useCallback((id) => { load(); nav(`/teach/${id}`) }, [load, nav])
 
   return (
     <section>
       <h1>Teach</h1>
-      <p className="muted">An expert does the job once on camera. The steps are written for you.</p>
-      <div className="card placeholder">Record / upload expert video — coming in Phase 4</div>
+      <p className="muted">An expert does the job once on camera, narrating each step. The SOP is written for you.</p>
+      <TeachUpload onReady={onReady} />
+
       <h2>Saved SOPs</h2>
       {sops.length === 0 ? (
         <p className="muted">No SOPs yet.</p>
       ) : (
-        <ul>{sops.map((s) => <li key={s.id}>{s.name} — {s.status}</li>)}</ul>
+        <div className="soplist">
+          {sops.map((s) => (
+            <Link key={s.id} to={`/teach/${s.id}`} className="sopitem">
+              <span>{s.name}</span>
+              <span className={`badge ${STATUS_CLASS[s.status] || ''}`}>{s.status}</span>
+            </Link>
+          ))}
+        </div>
       )}
     </section>
   )

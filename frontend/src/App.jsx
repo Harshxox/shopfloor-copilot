@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
 import { api } from './api.js'
 import Teach from './pages/Teach.jsx'
+import SopDetail from './pages/SopDetail.jsx'
 import Check from './pages/Check.jsx'
 import Report from './pages/Report.jsx'
 
@@ -39,6 +40,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/teach" replace />} />
           <Route path="/teach" element={<Teach />} />
+          <Route path="/teach/:id" element={<SopDetail />} />
           <Route path="/check" element={<Check />} />
           <Route path="/report" element={<Report />} />
         </Routes>
