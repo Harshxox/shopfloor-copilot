@@ -56,6 +56,16 @@ def teach_sop(
     return {"id": sop.id, "status": sop.status}
 
 
+@router.post("/{sop_id}/thumbnails")
+def redo_thumbnails(sop_id: int, use_sam: bool = True, session: Session = Depends(get_session)) -> dict:
+    """Re-run only the keyframe + SAM stage (no new Spark call). Returns what SAM found per step."""
+    sop = session.get(SOP, sop_id)
+    if not sop or not sop.video_path:
+        raise HTTPException(404, "SOP or its video not found")
+    from .. import config
+    return teach.make_thumbnails(sop_id, config.DATA_DIR / sop.video_path, use_sam)
+
+
 class StepUpdate(BaseModel):
     action: Optional[str] = None
     expected_end_state: Optional[str] = None

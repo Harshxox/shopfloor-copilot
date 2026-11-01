@@ -227,8 +227,12 @@ def sam_track(video: Path, phrase: str) -> dict[int, list[dict]]:
     return parse_frames(text)
 
 
+last_sam_raw: str = ""  # raw text of the most recent SAM image reply, for debugging
+
+
 def sam_image(image: Path, phrase: str) -> list[dict]:
     """SAM 3.1 on one still. Returns [{id, x1, y1, x2, y2, w, h}] for every match."""
+    global last_sam_raw
     data = "data:image/jpeg;base64," + base64.b64encode(Path(image).read_bytes()).decode()
     with _timed(f"sam_image '{phrase}'"):
         stream = client().responses.create(
@@ -239,10 +243,18 @@ def sam_image(image: Path, phrase: str) -> list[dict]:
             ]}],
             stream=True,
         )
-        text = ""
+        text, deltas, types = "", [], []
         for event in stream:
-            if getattr(event, "type", "") == "response.output_text.done":
+            etype = getattr(event, "type", "")
+            types.append(etype)
+            if etype == "response.output_text.delta":
+                deltas.append(getattr(event, "delta", ""))
+            elif etype == "response.output_text.done":
                 text = event.text
+            elif etype == "response.completed" and not text:
+                text = getattr(event.response, "output_text", "") or ""
+        text = text or "".join(deltas)
+    last_sam_raw = f"EVENT TYPES: {sorted(set(types))}\n\nTEXT ({len(text)} chars):\n{text[:3000]}"
     return parse_frames(text).get(0, [])
 
 

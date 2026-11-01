@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 FRAME_RE = re.compile(r"<(\d+)f>")
-BOX_RE = re.compile(r"(\d+)<\|box;([^|]*)\|>")
+BOX_RE = re.compile(r"(\d*)<\|box;([^|]*)\|>")  # video: '0<|box..|>'; images may omit the ordinal
 
 
 def text_from_jsonl(path: Path) -> str:
@@ -32,9 +32,10 @@ def parse_frames(text: str) -> dict[int, list[dict]]:
     for i in range(1, len(parts) - 1, 2):
         idx, body = int(parts[i]), parts[i + 1]
         objs = []
-        for obj_id, fields in BOX_RE.findall(body):
-            kv = dict(f.split("=") for f in fields.split(";"))
-            objs.append({"id": int(obj_id), **{k: int(v) for k, v in kv.items()}})
+        for n, (obj_id, fields) in enumerate(BOX_RE.findall(body)):
+            kv = dict(f.split("=", 1) for f in fields.split(";") if "=" in f)
+            objs.append({"id": int(obj_id) if obj_id else n,
+                         **{k: int(float(v)) for k, v in kv.items()}})
         frames[idx] = objs
     return frames
 
