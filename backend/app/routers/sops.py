@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, delete, select
 
 from ..db import get_session
-from ..models import SOP, Step
+from ..models import SOP, Step, StepTranslation
 from ..services import teach
 
 router = APIRouter()
@@ -83,9 +83,29 @@ def update_step(sop_id: int, step_id: int, body: StepUpdate, session: Session = 
     for k, v in body.model_dump(exclude_none=True).items():
         setattr(step, k, v)
     session.add(step)
+    session.exec(delete(StepTranslation).where(StepTranslation.sop_id == sop_id))  # re-translate later
     session.commit()
     session.refresh(step)
     return step
+
+
+@router.delete("/{sop_id}/steps/{step_id}")
+def delete_step(sop_id: int, step_id: int, session: Session = Depends(get_session)) -> list[Step]:
+    """Expert removes a step the AI shouldn't have written. Remaining steps are renumbered 1..n."""
+    step = session.get(Step, step_id)
+    if not step or step.sop_id != sop_id:
+        raise HTTPException(404, "Step not found")
+    session.delete(step)
+    session.exec(delete(StepTranslation).where(StepTranslation.sop_id == sop_id))
+    session.commit()
+    steps = session.exec(select(Step).where(Step.sop_id == sop_id).order_by(Step.idx)).all()
+    for i, s in enumerate(steps, start=1):
+        s.idx = i
+        session.add(s)
+    session.commit()
+    for s in steps:
+        session.refresh(s)
+    return list(steps)
 
 
 @router.delete("/{sop_id}", status_code=204)
@@ -94,6 +114,7 @@ def delete_sop(sop_id: int, session: Session = Depends(get_session)) -> None:
     if not sop:
         raise HTTPException(404, "SOP not found")
     session.exec(delete(Step).where(Step.sop_id == sop_id))
+    session.exec(delete(StepTranslation).where(StepTranslation.sop_id == sop_id))
     session.delete(sop)
     session.commit()
     shutil.rmtree(teach.sop_dir(sop_id), ignore_errors=True)

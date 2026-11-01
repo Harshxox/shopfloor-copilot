@@ -71,8 +71,16 @@ def parse_json(text: str) -> dict:
 SOP_PROMPT = (
     "You are an industrial engineer writing a standard operating procedure (SOP).\n"
     "Watch this whole video from start to end.{transcript_hint}\n"
-    "List EVERY physical step the person performs, in order — typically 3 to 12 steps. "
-    "Do not return an empty list. Trust what you SEE over what is said if they disagree.\n"
+    "List the steps that CHANGE THE STATE OF THE PRODUCT, in order: something is removed, attached, "
+    "inserted, tightened, loosened, opened, closed, slid or connected. Typically 3 to 10 steps.\n"
+    "Rules:\n"
+    "- Do NOT include preparation or presentation as steps: picking up or putting down a tool, "
+    "holding the object up, showing parts to the camera, inspecting without changing anything.\n"
+    "- Unpacking from packaging counts only if the product is actually taken out.\n"
+    "- Repeated actions on different parts are separate steps (e.g. 'Remove first bottom screw', "
+    "'Remove second bottom screw').\n"
+    "- One step = one visible change. A step must be checkable from its end state alone.\n"
+    "- Do not return an empty list. Trust what you SEE over what is said if they disagree.\n"
     "For each step give: id, action (imperative, e.g. 'Remove the top screw'), parts, tools, "
     "expected_end_state (what it visibly looks like when done), critical (true if skipping it causes a "
     "defect or safety risk), start_sec and end_sec.\n"
@@ -122,7 +130,9 @@ JUDGE_SYSTEM = (
     "reached by the end of the clip. Narration alone is not proof; a similar-looking action on a different "
     "part is not proof. If the clip shows a different SOP step, flag wrong_order and give its id. "
     "If you cannot see it clearly, flag unclear. Call exactly one tool. "
-    "Write instruction_for_worker in the worker's language: {language}."
+    "instruction_for_worker is SPOKEN ALOUD to the worker: write it in {language}, ONE short sentence, "
+    "at most 12 words, only what to do now (e.g. 'Remove the second bottom screw first.'). "
+    "No step numbers, no explanation — the reason field is for the supervisor."
 )
 
 JUDGE_TOOLS = [
@@ -147,7 +157,8 @@ JUDGE_TOOLS = [
                 "type": {"type": "string", "enum": ["skip", "wrong_order", "wrong_part", "missing", "unclear"]},
                 "observed_step_id": {"type": ["integer", "null"]},
                 "reason": {"type": "string"},
-                "instruction_for_worker": {"type": "string"},
+                "instruction_for_worker": {"type": "string",
+                                           "description": "Spoken to the worker: one sentence, max 12 words."},
             },
             "required": ["type", "observed_step_id", "reason", "instruction_for_worker"],
             "additionalProperties": False,
@@ -162,6 +173,7 @@ def observe(clip: Path) -> str:
     with _timed("observe"):
         resp = client().responses.create(
             model=config.SPARK_MODEL,
+            reasoning={"effort": "low"},
             input=[{"role": "user", "content": [
                 {"type": "input_video", "video_url": _video_url(clip)},
                 {"type": "input_text", "text": OBSERVE_PROMPT},
@@ -205,6 +217,28 @@ def judge(clip: Path, sop_text: str, step_label: str, end_state: str,
     return {"verdict": "flag", "type": "unclear", "observed_step_id": None,
             "reason": "Agent returned no valid tool call; needs supervisor review.",
             "instruction_for_worker": "", "raw_text": resp.output_text}
+
+
+def translate_steps(actions: list[str], language: str) -> list[str]:
+    """Translate short imperative step instructions for spoken use on the shop floor."""
+    lang = LANG_NAMES.get(language, "English")
+    prompt = (
+        f"Translate these assembly instructions into simple spoken {lang} for a factory worker. "
+        "Keep each one short and imperative. Keep part names a worker would say in English "
+        "(e.g. screw, PCB, USB) as they are commonly spoken. "
+        f"Return ONLY a JSON object: {{\"items\": [<{len(actions)} strings in the same order>]}}\n\n"
+        + json.dumps(actions, ensure_ascii=False)
+    )
+    with _timed(f"translate_steps {language}"):
+        resp = client().responses.create(
+            model=config.SPARK_MODEL,
+            input=[{"role": "user", "content": [{"type": "input_text", "text": prompt}]}],
+            reasoning={"effort": "low"},
+        )
+    items = parse_json(resp.output_text).get("items", [])
+    if len(items) != len(actions):
+        raise ValueError(f"translation returned {len(items)} items for {len(actions)} steps")
+    return [str(x) for x in items]
 
 
 # ---------- SAM 3.1 ----------

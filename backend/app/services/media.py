@@ -48,6 +48,13 @@ def has_audio(src: Path) -> bool:
     return bool(res.stdout.strip())
 
 
+def reencode_h264(src: Path, dst: Path) -> Path:
+    """OpenCV writes mp4v, which browsers won't play. Re-encode to H.264."""
+    _run(["-i", str(src), "-c:v", "libx264", "-preset", "veryfast", "-crf", "28",
+          "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(dst)])
+    return dst
+
+
 def cut_clip(src: Path, dst: Path, start: float, end: float) -> Path:
     _run(["-ss", f"{start:.2f}", "-to", f"{end:.2f}", "-i", str(src),
           "-c:v", "libx264", "-preset", "veryfast", "-crf", "30", "-c:a", "aac", str(dst)])

@@ -35,6 +35,15 @@ class Step(SQLModel, table=True):
     thumbnail_path: str = ""
 
 
+class StepTranslation(SQLModel, table=True):
+    """Step text spoken to the worker, translated once per language and cached."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    sop_id: int = Field(foreign_key="sop.id", index=True)
+    lang: str = Field(index=True)
+    idx: int
+    text: str
+
+
 class CheckRun(SQLModel, table=True):
     """One worker doing the SOP (Check mode)."""
     id: Optional[int] = Field(default=None, primary_key=True)
