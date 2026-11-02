@@ -1,0 +1,15 @@
+{
+  "cases": 14,
+  "errors": 0,
+  "accuracy": 0.786,
+  "correct_work_passed": 0.5,
+  "mistakes_caught": 1.0,
+  "false_alarm_rate": 0.5,
+  "missed_mistakes": 0,
+  "wrong_step_identified": 0.167,
+  "consistency": null,
+  "latency_p50_s": 19.0,
+  "latency_p90_s": 23.9,
+  "n_expected_pass": 6,
+  "n_expected_flag": 8
+}

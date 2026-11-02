@@ -80,6 +80,10 @@ SOP_PROMPT = (
     "- Repeated actions on different parts are separate steps (e.g. 'Remove first bottom screw', "
     "'Remove second bottom screw').\n"
     "- One step = one visible change. A step must be checkable from its end state alone.\n"
+    "- Use exact counts ('Remove the front screw' if there is one screw) — never write 'screw(s)'.\n"
+    "- When two steps act on similar-looking parts (front vs rear screw or cap, left vs right), the "
+    "expected_end_state MUST name the visible feature that tells them apart (e.g. 'the cap with the "
+    "USB-C opening' vs 'the closed cap with no opening').\n"
     "- Do not return an empty list. Trust what you SEE over what is said if they disagree.\n"
     "For each step give: id, action (imperative, e.g. 'Remove the top screw'), parts, tools, "
     "expected_end_state (what it visibly looks like when done), critical (true if skipping it causes a "
@@ -132,7 +136,14 @@ JUDGE_SYSTEM = (
     "— the worker may have started just before the clip — but nothing in the clip may contradict the result. "
     "Flag when: the end state is not visible or not reached (missing), a different SOP step was done "
     "(wrong_order, give its id), the wrong part was used (wrong_part), or you cannot see clearly (unclear). "
-    "Narration alone is never proof; a similar-looking motion is never proof. Call exactly one tool. "
+    "Narration alone is never proof; a similar-looking motion is never proof. "
+    "SIMILAR STEPS: if the clip could equally match another SOP step that looks alike (e.g. the front and the "
+    "rear version of the same screw or cap), pass ONLY if the feature that tells them apart (as written in the "
+    "end states) is actually visible; if it is not visible, flag unclear and ask the worker to show it. "
+    "If it visibly matches the other step instead, flag wrong_order with that step's id. "
+    "Use the list of already-completed steps as context: a part that was already removed in a completed step "
+    "cannot be removed again, so a look-alike step that is already done is NOT a valid alternative. "
+    "Call exactly one tool. "
     "instruction_for_worker is SPOKEN ALOUD to the worker: write it in {language}, ONE short sentence, "
     "at most 12 words, only what to do now (e.g. 'Remove the second bottom screw first.'). "
     "No step numbers, no explanation — the reason field is for the supervisor."
@@ -186,10 +197,11 @@ def observe(clip: Path) -> str:
 
 
 def judge(clip: Path, sop_text: str, step_label: str, end_state: str,
-          observation: str, language: str = "en") -> dict:
+          observation: str, language: str = "en", completed: str = "") -> dict:
     """Returns {"verdict": "pass"|"flag", ...tool args}. Malformed/no tool call -> flag 'unclear'."""
     text = (
         f"Full SOP:\n{sop_text}\n\n"
+        f"Steps this worker has ALREADY completed (verified earlier): {completed or 'none'}\n"
         f"Expected step for this clip: {step_label}\n"
         f"Expected end state: {end_state}\n\n"
         f"Independent observation of the clip (written without knowing the expected step):\n{observation}\n\n"

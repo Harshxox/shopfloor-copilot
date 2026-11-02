@@ -51,7 +51,8 @@ def meta(monkeypatch):
     monkeypatch.setattr(meta_client, "sam_track", lambda c, p: {
         i: [{"id": 0, "x1": 10, "y1": 10, "x2": 200, "y2": 200, "w": 640, "h": 360}] for i in range(20)})
 
-    def judge(clip, sop_text, step_label, end_state, observation, language="en"):
+    def judge(clip, sop_text, step_label, end_state, observation, language="en", completed=""):
+        state.setdefault("completed", []).append(completed)
         state["judge_langs"].append(language)
         assert "1. Remove top end cap" in sop_text and observation == "Hands remove a cap."
         return state["verdicts"].pop(0)
@@ -118,6 +119,9 @@ def test_full_run_pass_flag_override_done(sop_id, clip, meta):
         full = c.get(f"/api/runs/{run_id}").json()
         assert [e["kind"] for e in full["events"]] == ["pass", "flag", "pass", "pass"]
         assert meta["judge_langs"] == ["kn"] * 4
+        # history reaches the judge: step 1 done before step 2 is judged, steps 1-2 before step 3
+        assert meta["completed"][1] == "1. Remove top end cap"
+        assert meta["completed"][3] == "1. Remove top end cap, 2. Remove bottom screw"
         assert meta["translations"] == 1  # translated once, then cached
 
 

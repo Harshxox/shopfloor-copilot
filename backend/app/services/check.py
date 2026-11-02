@@ -140,10 +140,13 @@ def check_step(s: Session, run_id: int, upload: Path, step_idx: int | None = Non
     observation = meta_client.observe(clip)
     timings["observe_s"] = round(time.perf_counter() - t, 2)
 
+    done_idx = sorted({e.step_idx for e in s.exec(select(Event).where(Event.run_id == run_id))
+                       if e.kind in ("pass", "override") and e.step_idx != idx})
+    completed = ", ".join(f"{st.idx}. {st.action}" for st in steps if st.idx in done_idx)
     t = time.perf_counter()
     verdict = meta_client.judge(
         clip, sop_text(steps), f"Step {step.idx}: {step.action}", step.expected_end_state,
-        observation, run.worker_language,
+        observation, run.worker_language, completed=completed,
     )
     timings["judge_s"] = round(time.perf_counter() - t, 2)
     latency = round(time.perf_counter() - t0, 2)
