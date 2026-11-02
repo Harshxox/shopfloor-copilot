@@ -1,21 +1,19 @@
 clip,step,expected,expected_type,note
-ok1_unpack.mp4,1,pass,,correct: enclosure out of wrapper and held up
-ok1_unpack.mp4,5,flag,wrong_order,shows step 1 not 5
-ok2_topscrew.mp4,2,pass,,correct: top screw out and held up close
-ok2_topscrew.mp4,4,flag,wrong_order,shows step 2 not 4 (top vs bottom screw - hard)
-ok3_topcap.mp4,3,pass,,correct: top cap off and held next to enclosure
-ok3_topcap.mp4,6,flag,wrong_order,shows step 3 not 6
-ok4_bottomscrew.mp4,4,pass,,correct: bottom screw out and held up close
-ok4_bottomscrew.mp4,2,flag,wrong_order,shows step 4 not 2 (bottom vs top screw - hard)
-ok5_bottomcap.mp4,5,pass,,correct: bottom cap off and held next to enclosure
-ok5_bottomcap.mp4,3,flag,wrong_order,shows step 5 not 3 (bottom vs top cap - hard)
-ok6_slide.mp4,6,pass,,correct: inner part slid out and both pieces shown
-ok6_slide.mp4,1,flag,wrong_order,shows step 6 not 1
-ok2b_topscrew_take2.mp4,2,pass,,second take of step 2 (robustness)
-ok4b_bottomscrew_take2.mp4,4,pass,,second take of step 4 (robustness)
-bad1_topscrew_incomplete.mp4,2,flag,missing,screwdriver twisted at top but screw never comes out
-bad2_cap_screw_still_in.mp4,3,flag,missing,pulls at top cap while top screw is still in - cap stays on
-bad3_slide_too_early.mp4,6,flag,skip,tries to slide inner part out while bottom cap is still on
-bad4_wrong_order.mp4,2,flag,wrong_order,removes bottom screw instead of top screw - shows step 4
-bad5_hidden.mp4,5,flag,unclear,bottom cap removed but hands block the view the whole time
-bad6_talk_only.mp4,5,flag,missing,says 'bottom cap removed' but does nothing (narration is not proof)
+ok1_unpack.mp4,1,pass,,correct: enclosure out of sleeve and held up
+ok1_unpack.mp4,3,flag,wrong_order,shows step 1 not 3
+ok3_topcap.mp4,2,pass,,correct: top cap off and USB-C end open
+ok3_topcap.mp4,4,flag,wrong_order,shows step 2 not 4
+ok5_bottomcap.mp4,3,pass,,correct: bottom cap off and bottom end open
+ok5_bottomcap.mp4,2,flag,wrong_order,shows step 3 not 2 (top vs bottom cap - hard)
+ok6_slide.mp4,4,pass,,correct: PCB slid out and both parts shown
+ok6_slide.mp4,1,flag,wrong_order,shows step 4 not 1
+ok2_topscrew.mp4,2,flag,missing,top screw loosened but cap never removed (incomplete step)
+ok4_bottomscrew.mp4,3,flag,missing,bottom screw worked but cap never removed (incomplete step)
+bad1_topscrew_incomplete.mp4,2,flag,missing,screwdriver twisted at top but cap stays on
+bad5_hidden.mp4,3,flag,unclear,bottom cap removed but hands block the view the whole time
+bad2_cap_screw_still_in.mp4,2,flag,missing,pulls at top cap while screw still tight - cap stays on
+bad3_slide_too_early.mp4,4,flag,skip,tries to slide PCB out while bottom cap is still on
+bad4_wrong_order.mp4,2,flag,wrong_order,removes bottom cap before top cap - shows step 3
+bad6_talk_only.mp4,3,flag,missing,says 'bottom cap removed' but does nothing (narration is not proof)
+ok3b_topcap_take2.mp4,2,pass,,second take of step 2 (robustness)
+ok5b_bottomcap_take2.mp4,3,pass,,second take of step 3 (robustness)

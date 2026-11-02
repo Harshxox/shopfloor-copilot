@@ -1,34 +1,32 @@
 ## Evaluation — Disassemble ZEBRONICS M.2 SSD Enclosure
 
-14 judgements on 8 real recorded clips (6 correct-work cases, 8 mistake cases). Model: `muse-spark-1.2` (blind observe + strict judge).
+12 judgements on 8 real recorded clips (4 correct-work cases, 8 mistake cases). Model: `muse-spark-1.2` (blind observe + strict judge).
 
 | Metric | Result |
 |---|---|
-| Overall accuracy | **79%** |
+| Overall accuracy | **100%** |
 | Mistakes caught | **100%** (0 missed) |
-| Correct work passed | 50% |
-| False alarm rate | 50% |
-| Wrong step identified correctly | 17% |
+| Correct work passed | 100% |
+| False alarm rate | 0% |
+| Wrong step identified correctly | 50% |
 | Consistency across repeats | — |
-| Check time p50 / p90 | 19.0 s / 23.9 s |
+| Check time p50 / p90 | 18.1 s / 21.8 s |
 
 <details><summary>Every case</summary>
 
 | Clip | Step | Expected | Got | Note |
 |---|---|---|---|---|
-| bad1_topscrew_incomplete.mp4 | 2 | flag | ✅ flag (missing) | screwdriver twisted at top but screw never comes out |
-| bad5_hidden.mp4 | 5 | flag | ✅ flag (missing) | bottom cap removed but hands block the view the whole time |
-| ok1_unpack.mp4 | 1 | pass | ❌ flag (missing) | correct: enclosure out of wrapper and held up |
-| ok1_unpack.mp4 | 5 | flag | ✅ flag (missing) | shows step 1 not 5 |
-| ok2_topscrew.mp4 | 2 | pass | ❌ flag (missing) | correct: top screw out and held up close |
-| ok2_topscrew.mp4 | 4 | flag | ✅ flag (missing) | shows step 2 not 4 (top vs bottom screw - hard) |
-| ok3_topcap.mp4 | 3 | pass | ✅ pass | correct: top cap off and held next to enclosure |
-| ok3_topcap.mp4 | 6 | flag | ✅ flag (missing) | shows step 3 not 6 |
-| ok4_bottomscrew.mp4 | 2 | flag | ✅ flag (wrong_order) | shows step 4 not 2 (bottom vs top screw - hard) |
-| ok4_bottomscrew.mp4 | 4 | pass | ❌ flag (wrong_order) | correct: bottom screw out and held up close |
-| ok5_bottomcap.mp4 | 3 | flag | ✅ flag (unclear) | shows step 5 not 3 (bottom vs top cap - hard) |
-| ok5_bottomcap.mp4 | 5 | pass | ✅ pass | correct: bottom cap off and held next to enclosure |
-| ok6_slide.mp4 | 1 | flag | ✅ flag (wrong_order) | shows step 6 not 1 |
-| ok6_slide.mp4 | 6 | pass | ✅ pass | correct: inner part slid out and both pieces shown |
+| bad1_topscrew_incomplete.mp4 | 2 | flag | ✅ flag (missing) | screwdriver twisted at top but cap stays on |
+| bad5_hidden.mp4 | 3 | flag | ✅ flag (missing) | bottom cap removed but hands block the view the whole time |
+| ok1_unpack.mp4 | 1 | pass | ✅ pass | correct: enclosure out of sleeve and held up |
+| ok1_unpack.mp4 | 3 | flag | ✅ flag (wrong_order) | shows step 1 not 3 |
+| ok2_topscrew.mp4 | 2 | flag | ✅ flag (missing) | top screw loosened but cap never removed (incomplete step) |
+| ok3_topcap.mp4 | 2 | pass | ✅ pass | correct: top cap off and USB-C end open |
+| ok3_topcap.mp4 | 4 | flag | ✅ flag (missing) | shows step 2 not 4 |
+| ok4_bottomscrew.mp4 | 3 | flag | ✅ flag (missing) | bottom screw worked but cap never removed (incomplete step) |
+| ok5_bottomcap.mp4 | 2 | flag | ✅ flag (unclear) | shows step 3 not 2 (top vs bottom cap - hard) |
+| ok5_bottomcap.mp4 | 3 | pass | ✅ pass | correct: bottom cap off and bottom end open |
+| ok6_slide.mp4 | 1 | flag | ✅ flag (wrong_order) | shows step 4 not 1 |
+| ok6_slide.mp4 | 4 | pass | ✅ pass | correct: PCB slid out and both parts shown |
 
 </details>

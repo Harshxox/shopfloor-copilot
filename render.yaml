@@ -1,0 +1,17 @@
+# Render blueprint: New + > Blueprint > pick this repo. Set MODEL_API_KEY when asked.
+services:
+  - type: web
+    name: shopfloor-copilot
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: MODEL_API_KEY
+        sync: false
+      - key: SPARK_MODEL
+        value: muse-spark-1.2
+      - key: RATE_PER_IP_HOUR
+        value: "60"
+      - key: RATE_DAILY_CAP
+        value: "600"
