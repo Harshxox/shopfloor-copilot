@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom'
 import { api } from './api.js'
+import Landing from './pages/Landing.jsx'
 import Teach from './pages/Teach.jsx'
 import SopDetail from './pages/SopDetail.jsx'
 import Check from './pages/Check.jsx'
@@ -24,12 +25,15 @@ function HealthBadge() {
   )
 }
 
-export default function App() {
+function Workspace() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-text">ShopFloor Copilot</span></div>
-        <nav>
+        <Link className="brand" to="/" aria-label="ShopFloor Copilot home">
+          <span className="brand-mark" aria-hidden="true" />
+          <span className="brand-text">shopfloor <span>copilot</span></span>
+        </Link>
+        <nav aria-label="Workspace">
           <NavLink to="/teach">Teach</NavLink>
           <NavLink to="/check">Check</NavLink>
           <NavLink to="/report">Report</NavLink>
@@ -38,13 +42,22 @@ export default function App() {
       </header>
       <main>
         <Routes>
-          <Route path="/" element={<Navigate to="/teach" replace />} />
           <Route path="/teach" element={<Teach />} />
           <Route path="/teach/:id" element={<SopDetail />} />
           <Route path="/check" element={<Check />} />
           <Route path="/report" element={<Report />} />
+          <Route path="*" element={<Navigate to="/teach" replace />} />
         </Routes>
       </main>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/*" element={<Workspace />} />
+    </Routes>
   )
 }
