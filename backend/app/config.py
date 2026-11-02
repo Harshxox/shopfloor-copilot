@@ -20,3 +20,10 @@ DB_URL = os.environ.get("DB_URL", f"sqlite:///{DATA_DIR / 'shopfloor.db'}")
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
 REQUEST_TIMEOUT_S = float(os.environ.get("REQUEST_TIMEOUT_S", "180"))
 MAX_RETRIES = int(os.environ.get("MAX_RETRIES", "2"))
+
+FRONTEND_DIST = os.environ.get("FRONTEND_DIST", str(ROOT / "frontend" / "dist"))
+SEED_DIR = Path(os.environ.get("SEED_DIR", ROOT / "backend" / "seed"))
+
+# Protect API credits on a public deploy: Meta-calling requests per IP per hour, and per day overall.
+RATE_PER_IP_HOUR = int(os.environ.get("RATE_PER_IP_HOUR", "60"))
+RATE_DAILY_CAP = int(os.environ.get("RATE_DAILY_CAP", "600"))

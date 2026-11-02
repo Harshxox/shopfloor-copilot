@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, delete, select
 
 from ..db import get_session
+from ..limits import meta_budget
 from ..models import SOP, Step, StepTranslation
 from ..services import teach
 
@@ -30,7 +31,7 @@ def get_sop(sop_id: int, session: Session = Depends(get_session)) -> dict:
     return {"sop": sop, "steps": steps}
 
 
-@router.post("/teach", status_code=202)
+@router.post("/teach", status_code=202, dependencies=[Depends(meta_budget)])
 def teach_sop(
     background: BackgroundTasks,
     video: UploadFile = File(..., description="Expert video (mp4/mov/webm), ideally with narration"),
@@ -56,7 +57,7 @@ def teach_sop(
     return {"id": sop.id, "status": sop.status}
 
 
-@router.post("/{sop_id}/thumbnails")
+@router.post("/{sop_id}/thumbnails", dependencies=[Depends(meta_budget)])
 def redo_thumbnails(sop_id: int, use_sam: bool = True, session: Session = Depends(get_session)) -> dict:
     """Re-run only the keyframe + SAM stage (no new Spark call). Returns what SAM found per step."""
     sop = session.get(SOP, sop_id)

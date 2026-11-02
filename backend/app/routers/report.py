@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sqlmodel import Session
 
 from ..db import get_session
+from ..limits import meta_budget
 from ..services import report
 
 router = APIRouter()
@@ -22,7 +23,7 @@ class SuggestBody(BaseModel):
     sop_id: int
 
 
-@router.post("/suggestions")
+@router.post("/suggestions", dependencies=[Depends(meta_budget)])
 def get_suggestions(body: SuggestBody, session: Session = Depends(get_session)) -> dict:
     """Muse Spark proposes 3 SOP changes grounded in the correction data."""
     try:

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from ..db import get_session
+from ..limits import meta_budget
 from ..models import CheckRun, Event
 from ..services import check
 
@@ -19,7 +20,7 @@ class StartRun(BaseModel):
     worker_language: str = "en"  # en | kn | hi
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, dependencies=[Depends(meta_budget)])
 def start_run(body: StartRun, session: Session = Depends(get_session)) -> dict:
     """Start a worker run. Returns the first instruction to speak, plus every step in the worker's language."""
     try:
@@ -43,7 +44,7 @@ def get_run(run_id: int, session: Session = Depends(get_session)) -> dict:
             "step_texts": check.step_texts(session, run.sop_id, run.worker_language)}
 
 
-@router.post("/{run_id}/check")
+@router.post("/{run_id}/check", dependencies=[Depends(meta_budget)])
 def check_step(
     run_id: int,
     clip: UploadFile = File(..., description="Short clip of the worker doing the current step"),

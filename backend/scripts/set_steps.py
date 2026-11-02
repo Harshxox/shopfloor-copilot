@@ -1,4 +1,7 @@
-"""Set the action + 'done when' text of every step of an SOP in one go (instead of editing in the UI).
+"""Reshape an SOP to the final 4-step procedure: every step has a VISIBLE end state.
+
+A loosened screw looks the same as an untouched one, so 'loosen screw' + 'remove cap' are merged
+into one step each. Deletes the screw-only steps (if present), renumbers, and sets exact text.
 
 Run from backend\\ with uvicorn running:   python scripts\\set_steps.py --sop 3
 """
@@ -8,31 +11,34 @@ import requests
 
 API = "http://localhost:8000/api"
 
-STEPS = {
-    1: ("Remove the enclosure from the plastic sleeve",
-        "The enclosure is out of the plastic sleeve and held up; the sleeve is pushed aside"),
-    2: ("Remove the top screw (USB-C end, silver stripe side)",
-        "The single top screw near the silver stripe is fully out and held up to the camera"),
-    3: ("Remove the top cap (USB-C end, silver stripe side)",
-        "The top cap is off and the USB-C end next to the silver stripe is open"),
-    4: ("Remove the bottom screw (end without the silver stripe)",
-        "The single bottom screw, at the end away from the silver stripe, is fully out and held up to the camera"),
-    5: ("Remove the bottom cap (end without the silver stripe)",
-        "The bottom cap is off and the end away from the silver stripe is open"),
-    6: ("Slide the inner PCB out of the housing",
-        "The black PCB is fully out of the aluminium housing; PCB and empty housing are shown separately"),
-}
+FINAL = [
+    ("Remove the enclosure from the plastic sleeve",
+     "The enclosure is out of the plastic sleeve and held up; the sleeve is pushed aside"),
+    ("Unscrew and remove the top cap (USB-C end, silver stripe side)",
+     "The top cap is fully off and the USB-C end next to the silver stripe is open"),
+    ("Unscrew and remove the bottom cap (end without the silver stripe)",
+     "The bottom cap is fully off and the end away from the silver stripe is open"),
+    ("Slide the inner PCB out of the housing",
+     "The black PCB is fully out of the aluminium housing; PCB and empty housing are shown separately"),
+]
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--sop", type=int, required=True)
 a = ap.parse_args()
 
 steps = requests.get(f"{API}/sops/{a.sop}").json()["steps"]
-if len(steps) != len(STEPS):
-    raise SystemExit(f"SOP {a.sop} has {len(steps)} steps, expected {len(STEPS)}. Fix the step count first.")
+# remove screw-only steps (an action about a screw that isn't also about the cap)
 for st in steps:
-    action, done = STEPS[st["idx"]]
-    r = requests.patch(f"{API}/sops/{a.sop}/steps/{st['id']}", json={"action": action, "expected_end_state": done})
-    r.raise_for_status()
+    act = st["action"].lower()
+    if "screw" in act and "cap" not in act:
+        requests.delete(f"{API}/sops/{a.sop}/steps/{st['id']}").raise_for_status()
+        print(f"deleted step: {st['action']}")
+steps = requests.get(f"{API}/sops/{a.sop}").json()["steps"]
+if len(steps) != len(FINAL):
+    raise SystemExit(f"SOP {a.sop} now has {len(steps)} steps, expected {len(FINAL)}: "
+                     f"{[s['action'] for s in steps]}")
+for st, (action, done) in zip(steps, FINAL):
+    requests.patch(f"{API}/sops/{a.sop}/steps/{st['id']}",
+                   json={"action": action, "expected_end_state": done, "critical": st["idx"] > 1}).raise_for_status()
     print(f"{st['idx']}. {action}\n   done when: {done}")
-print("\nAll steps updated. Refresh the Teach page to see them.")
+print("\nSOP reshaped to 4 steps. Refresh the Teach page to see it.")
