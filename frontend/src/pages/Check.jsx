@@ -256,9 +256,10 @@ function ActiveRun({ start }) {
     const overrides = history.filter((e) => e.kind === 'override').length
     return (
       <div className="card done-card">
-        <h2>✓ All {steps.length} steps complete</h2>
+        <span className="sign" aria-hidden="true">✓</span>
+        <h2>All {steps.length} steps complete</h2>
         <p className="said">{said}</p>
-        <p className="muted">{flags} correction{flags === 1 ? '' : 's'} · {overrides} supervisor override{overrides === 1 ? '' : 's'}</p>
+        <p className="muted">{flags} correction{flags === 1 ? '' : 's'}, {overrides} supervisor override{overrides === 1 ? '' : 's'}</p>
         <div className="row">
           <Link to="/report"><button className="primary">View report</button></Link>
           <button onClick={() => window.location.reload()}>Start another shift</button>
@@ -273,13 +274,14 @@ function ActiveRun({ start }) {
         <div className={`cam ${phase}`}>
           {camError ? <div className="nocam">Camera unavailable ({camError}). Use “Upload clip”.</div>
             : <video ref={videoRef} autoPlay muted playsInline />}
-          {phase === 'recording' && recorder.recording && <span className="rec">● REC {recorder.seconds}s</span>}
-          {phase === 'checking' && <div className="overlay"><div className="spinner" />Checking with Muse Spark…</div>}
+          {phase === 'recording' && recorder.recording && <span className="rec">● Recording {recorder.seconds}s</span>}
+          {phase === 'checking' && <div className="overlay"><div className="spinner" />Checking the step with Muse Spark</div>}
         </div>
 
         {result && (
           <div className={`verdict ${result.event.kind}`}>
-            <div className="vhead">{result.event.kind === 'pass' ? '✓ Correct' : `✗ ${labelFor(result.event.deviation_type)}`}</div>
+            <span className="sign" aria-hidden="true">{result.event.kind === 'pass' ? '✓' : '✕'}</span>
+            <div className="vhead">{result.event.kind === 'pass' ? 'Correct' : labelFor(result.event.deviation_type)}</div>
             <p className="said">{result.say}</p>
             {result.event.kind === 'flag' && (
               <>
@@ -301,7 +303,7 @@ function ActiveRun({ start }) {
 
       <div className="stepcol">
         <div className="stepnow card">
-          <div className="small muted">Step {run.current_step} of {steps.length}{step?.critical ? ' · Critical' : ''}</div>
+          <div className="small muted">Step {run.current_step} of {steps.length}{step?.critical && <span className="tag crit" style={{ marginLeft: 8 }}>Critical</span>}</div>
           <h2 className="native">{texts[run.current_step]}</h2>
           {lang !== 'en' && step && <p className="muted small">{step.action}</p>}
           {step?.thumbnail_path && <img src={`/media/${step.thumbnail_path}`} alt="" className="ref" />}
@@ -355,7 +357,7 @@ export default function Check() {
   return (
     <section className={start ? 'wide' : ''}>
       <h1>Check</h1>
-      <p className="muted">The worker does the job; each step is checked and corrected out loud.</p>
+      <p className="muted">The worker does the job. Each step is checked and corrected out loud.</p>
       {start ? <ActiveRun start={start} />
         : <StartRun initialSop={params.get('sop')} initialLang={params.get('lang')} onStarted={setStart} />}
     </section>

@@ -48,11 +48,11 @@ export default function SopDetail() {
 
   return (
     <section>
-      <Link to="/teach" className="muted small">← All SOPs</Link>
+      <Link to="/teach" className="backlink">All procedures</Link>
       <div className="titlebar">
         <div>
           <h1>{sop.name}</h1>
-          <p className="muted">{steps.length} steps · {critical} critical · status {sop.status}</p>
+          <p className="muted">{steps.length} steps, {critical} critical</p>
         </div>
         <button className="danger ghost" onClick={remove}>Delete</button>
       </div>
@@ -63,22 +63,22 @@ export default function SopDetail() {
           {sop.transcript && (
             <div className="card small">
               <button className="link" onClick={() => setShowTranscript(!showTranscript)}>
-                {showTranscript ? 'Hide' : 'Show'} expert narration
+                {showTranscript ? 'Hide' : 'Show'} the expert’s narration
               </button>
               {showTranscript && <pre className="transcript">{sop.transcript}</pre>}
             </div>
           )}
         </div>
         <div className="card start">
-          <h2>Train a worker on this</h2>
-          <p className="muted small">The worker hears corrections in their language.</p>
+          <h2>Check a worker</h2>
+          <p className="muted small">Each step is checked on camera. Corrections are spoken in the language you pick.</p>
           <div className="langs">
             {LANGS.map(([code, label]) => (
               <button key={code} className={lang === code ? 'on' : ''} onClick={() => setLang(code)}>{label}</button>
             ))}
           </div>
           <button className="primary big" onClick={startCheck} disabled={sop.status !== 'ready'}>
-            Start Check mode →
+            Start checking
           </button>
         </div>
       </div>

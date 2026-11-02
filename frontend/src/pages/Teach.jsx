@@ -17,12 +17,12 @@ export default function Teach() {
   return (
     <section>
       <h1>Teach</h1>
-      <p className="muted">An expert does the job once on camera, narrating each step. The SOP is written for you.</p>
+      <p className="muted">Record an expert doing the job once and talking through each step. ShopFloor Copilot turns it into a checked procedure.</p>
       <TeachUpload onReady={onReady} />
 
-      <h2>Saved SOPs</h2>
+      <h2>Procedures</h2>
       {sops.length === 0 ? (
-        <p className="muted">No SOPs yet.</p>
+        <p className="muted">No procedures yet. Upload an expert video above to create the first one.</p>
       ) : (
         <div className="soplist">
           {sops.map((s) => (

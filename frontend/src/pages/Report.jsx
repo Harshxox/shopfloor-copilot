@@ -95,7 +95,7 @@ export default function Report() {
           <h1>Shift report</h1>
           <p className="muted">What went wrong across worker runs, and how to fix the procedure.</p>
         </div>
-        <button onClick={exportMd}>Export (.md)</button>
+        <button onClick={exportMd}>Download report</button>
       </div>
       <select value={sopId} onChange={(e) => setSopId(e.target.value)}>
         {rep.sops.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -104,11 +104,11 @@ export default function Report() {
       {k.runs === 0 ? <p className="muted" style={{ marginTop: 20 }}>No worker runs on this SOP yet.</p> : (
         <>
           <div className="tiles">
-            <Tile label="Worker runs" value={k.runs} sub={`${k.completed_runs} completed · ${k.clean_runs} with zero corrections`} />
+            <Tile label="Worker runs" value={k.runs} sub={`${k.completed_runs} completed, ${k.clean_runs} without corrections`} />
             <Tile label="First-try pass rate" value={pct(k.first_try_pass_rate)} sub={`over ${k.checks} step checks`} />
             <Tile label="Corrections given" value={k.corrections} sub="mistakes caught before they shipped" />
-            <Tile label="False alarms" value={k.false_alarms} sub={`supervisor overrides · ${pct(k.false_alarm_rate)} of corrections`} />
-            <Tile label="Avg check time" value={k.avg_check_seconds ? `${k.avg_check_seconds}s` : '—'} sub="Muse Spark observe + judge" />
+            <Tile label="False alarms" value={k.false_alarms} sub={`supervisor overrides, ${pct(k.false_alarm_rate)} of corrections`} />
+            <Tile label="Avg check time" value={k.avg_check_seconds ? `${k.avg_check_seconds}s` : '—'} sub="Muse Spark observe and judge" />
           </div>
 
           {rep.most_failed_step && (
@@ -169,7 +169,7 @@ export default function Report() {
                 <div key={f.id} className="flagcard">
                   <video src={`/media/${f.clip_path}`} controls muted playsInline preload="metadata" />
                   <div>
-                    <div className="small muted">Run {f.run_id} · step {f.step_idx} · {new Date(f.created_at).toLocaleString()}</div>
+                    <div className="small muted">Run {f.run_id}, step {f.step_idx}, {new Date(f.created_at).toLocaleString()}</div>
                     <strong>{f.label}</strong>{f.overridden && <span className="tag">False alarm</span>}
                     <p className="small">{f.reason}</p>
                     {f.instruction && <p className="small">Worker heard: “{f.instruction}”</p>}

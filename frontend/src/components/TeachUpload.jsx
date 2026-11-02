@@ -137,17 +137,17 @@ export default function TeachUpload({ onReady }) {
       {mode === 'upload' ? (
         <label className="drop">
           <input type="file" accept="video/*" onChange={(e) => setFile(e.target.files[0] || null)} />
-          {file ? <strong>{file.name}</strong> : <span>Choose the expert's video (mp4, mov, webm)</span>}
+          {file ? <><strong>{file.name}</strong><span className="small">Click to choose a different video</span></> : <><strong>Choose the expert’s video</strong><span className="small">MP4, MOV or WebM, with narration</span></>}
         </label>
       ) : (
         <Recorder onRecorded={(f) => { setFile(f); setMode('upload') }} />
       )}
 
       <div className="row">
-        <input placeholder="Procedure name (optional — AI will name it)" value={name}
+        <input placeholder="Procedure name (optional, Muse Spark names it otherwise)" value={name}
                onChange={(e) => setName(e.target.value)} />
         <button className="primary" disabled={!file || busy || running} onClick={submit}>
-          {running ? 'Working…' : 'Build SOP'}
+          {running ? 'Building…' : 'Build procedure'}
         </button>
       </div>
 

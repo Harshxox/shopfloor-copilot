@@ -14,12 +14,12 @@ function HealthBadge() {
     api('/health').then(setHealth).catch((e) => setError(e.message))
   }, [])
 
-  if (error) return <span className="badge bad">Backend offline</span>
-  if (!health) return <span className="badge">Checking…</span>
+  if (error) return <span className="badge bad">Server offline</span>
+  if (!health) return <span className="badge">Connecting</span>
   const ok = health.meta_key_set && health.ffmpeg
   return (
     <span className={`badge ${ok ? 'good' : 'warn'}`} title={JSON.stringify(health.models)}>
-      {ok ? 'Backend ready' : `Backend up — ${!health.meta_key_set ? 'API key missing' : 'ffmpeg missing'}`}
+      {ok ? 'Ready' : (!health.meta_key_set ? 'API key missing' : 'ffmpeg missing')}
     </span>
   )
 }
@@ -28,7 +28,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">ShopFloor Copilot</div>
+        <div className="brand"><span className="brand-mark" aria-hidden="true" /><span className="brand-text">ShopFloor Copilot</span></div>
         <nav>
           <NavLink to="/teach">Teach</NavLink>
           <NavLink to="/check">Check</NavLink>
