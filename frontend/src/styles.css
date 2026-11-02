@@ -114,3 +114,99 @@ input, textarea {
 @media (max-width: 720px) {
   .grid2, .step { grid-template-columns: 1fr; }
 }
+
+/* ---------- Phase 6: Check ---------- */
+main:has(section.wide) { max-width: 1240px; }
+select {
+  font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 8px; padding: 9px 12px; width: 100%; margin-top: 4px;
+}
+.warn { color: var(--warn); }
+.checkgrid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+.cam { position: relative; background: #000; border-radius: 14px; overflow: hidden; aspect-ratio: 16/9; border: 3px solid var(--line); }
+.cam.recording { border-color: var(--bad); }
+.cam.checking { border-color: var(--accent); }
+.cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nocam { display: grid; place-items: center; height: 100%; color: var(--muted); padding: 20px; text-align: center; }
+.rec { position: absolute; top: 12px; left: 12px; background: var(--bad); color: #fff; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-size: 14px; }
+.overlay { position: absolute; inset: 0; background: #000b; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; font-size: 18px; }
+.spinner { width: 42px; height: 42px; border: 4px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.verdict { margin-top: 14px; border-radius: 14px; padding: 16px 18px; border: 2px solid; }
+.verdict.pass { border-color: var(--good); background: #22c55e14; }
+.verdict.flag { border-color: var(--bad); background: #ef444414; }
+.vhead { font-size: 22px; font-weight: 800; }
+.verdict.pass .vhead { color: var(--good); }
+.verdict.flag .vhead { color: var(--bad); }
+.said { font-size: 20px; margin: 8px 0; line-height: 1.4; }
+details { margin: 6px 0; color: var(--muted); }
+.evidence { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.evidence video { width: 100%; max-height: 260px; border-radius: 10px; background: #000; }
+.stepnow { margin-top: 0; display: flex; flex-direction: column; gap: 8px; }
+.stepnow h2.native { margin: 0; font-size: 24px; line-height: 1.35; }
+.stepnow .ref { width: 100%; border-radius: 10px; }
+.hint { background: #3b82f61a; border: 1px solid #3b82f655; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0; }
+.stepbar { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.stepbar li { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+.stepbar .n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--line); font-size: 12px; flex: none; }
+.stepbar li.active { color: var(--text); border-color: var(--accent); }
+.stepbar li.active .n { background: var(--accent); color: #fff; }
+.stepbar li.done .n { background: var(--good); color: #fff; }
+.stepbar li.flagged { border-color: var(--bad); color: var(--text); }
+.stepbar li.flagged .n { background: var(--bad); color: #fff; }
+.done-card { text-align: center; }
+.done-card h2 { color: var(--good); font-size: 28px; }
+.done-card .row { justify-content: center; }
+@media (max-width: 860px) { .checkgrid { grid-template-columns: 1fr; } }
+
+/* ---------- Phase 7: phone / head-mounted ---------- */
+.voicetoggle { margin-top: 8px; color: var(--muted); }
+@media (max-width: 860px) {
+  .topbar { padding: 8px 12px; gap: 10px; flex-wrap: wrap; }
+  .brand { font-size: 15px; }
+  .topbar .badge { display: none; }
+  main { padding: 10px; }
+  section.wide > h1, section.wide > p.muted { display: none; }
+  .checkgrid { margin-top: 0; gap: 10px; }
+  .cam { aspect-ratio: 4/3; border-radius: 10px; }
+  .stepnow { padding: 14px; padding-bottom: 130px; }
+  .stepnow h2.native { font-size: 22px; }
+  .stepnow .ref { display: none; }
+  .donebar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 12px 14px;
+    background: var(--panel); border-top: 1px solid var(--line);
+  }
+  .donebar button.big { margin-top: 0; padding: 18px; font-size: 20px; }
+  .stepbar li { padding: 6px 8px; font-size: 13px; }
+  .said { font-size: 22px; }
+}
+.voicestatus { margin: 6px 0 0; color: var(--muted); }
+.voicestatus.error { color: var(--warn); }
+.voicestatus.triggered { color: var(--good); }
+
+/* ---------- Phase 8: Report ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 16px 0; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.tval { font-size: 32px; font-weight: 700; line-height: 1.1; }
+.tlabel { font-size: 14px; margin-top: 4px; }
+.tsub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.callout { background: #f59e0b14; border: 1px solid #f59e0b66; border-radius: 10px; padding: 12px 14px; }
+.rgrid { margin-top: 16px; grid-template-columns: 1.5fr 1fr; }
+.rgrid h2 { margin-top: 0; }
+.steptable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.steptable th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.steptable td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.steptable td:nth-child(4) { width: 34%; }
+.steptable .tag { margin-left: 6px; }
+.barcell { display: flex; align-items: center; gap: 8px; }
+.barcell .bar { height: 10px; min-width: 2px; background: var(--accent); border-radius: 0 4px 4px 0; }
+.typelist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.typelist li { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; }
+.sugg { margin: 12px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+.sugg p { margin: 4px 0; }
+.flags { display: flex; flex-direction: column; gap: 10px; }
+.flagcard { display: grid; grid-template-columns: 220px 1fr; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--bad); border-radius: 12px; padding: 10px; }
+.flagcard video { width: 100%; border-radius: 8px; background: #000; }
+.flagcard p { margin: 4px 0; }
+.flagcard .tag { margin-left: 8px; color: var(--muted); border: 1px solid var(--line); }
+@media (max-width: 860px) { .rgrid, .flagcard { grid-template-columns: 1fr; } }

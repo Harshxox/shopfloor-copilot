@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .db import init_db
-from .routers import runs, sops
+from .routers import report, runs, sops
 from .services import media
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -48,4 +48,5 @@ def health() -> dict:
 
 app.include_router(sops.router, prefix="/api/sops", tags=["sops"])
 app.include_router(runs.router, prefix="/api/runs", tags=["runs"])
+app.include_router(report.router, prefix="/api/report", tags=["report"])
 app.mount("/media", StaticFiles(directory=config.DATA_DIR), name="media")
