@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Route, Routes } from 'react-router-dom'
 import { api } from './api.js'
-import Landing from './pages/Landing.jsx'
 import Teach from './pages/Teach.jsx'
 import SopDetail from './pages/SopDetail.jsx'
 import Check from './pages/Check.jsx'
 import Report from './pages/Report.jsx'
+import Home from './pages/Home.jsx'
 
 function HealthBadge() {
   const [health, setHealth] = useState(null)
@@ -25,15 +25,12 @@ function HealthBadge() {
   )
 }
 
-function Workspace() {
+export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <Link className="brand" to="/" aria-label="ShopFloor Copilot home">
-          <span className="brand-mark" aria-hidden="true" />
-          <span className="brand-text">shopfloor <span>copilot</span></span>
-        </Link>
-        <nav aria-label="Workspace">
+        <Link to="/" className="brand">ShopFloor Copilot<span className="stop">.</span></Link>
+        <nav>
           <NavLink to="/teach">Teach</NavLink>
           <NavLink to="/check">Check</NavLink>
           <NavLink to="/report">Report</NavLink>
@@ -42,22 +39,13 @@ function Workspace() {
       </header>
       <main>
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/teach" element={<Teach />} />
           <Route path="/teach/:id" element={<SopDetail />} />
           <Route path="/check" element={<Check />} />
           <Route path="/report" element={<Report />} />
-          <Route path="*" element={<Navigate to="/teach" replace />} />
         </Routes>
       </main>
     </div>
-  )
-}
-
-export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/*" element={<Workspace />} />
-    </Routes>
   )
 }
